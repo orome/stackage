@@ -63,12 +63,12 @@ BINDIR=$(cd $ROOT/work/bin ; pwd)
 cd $BINDIR
 rm -f curator stack *.bz2
 
-curl -L "https://s3.amazonaws.com/haddock.stackage.org/curator/curator-80cd5b697f5b00ba13b1bba89cf31918201ce6f0.bz2" | bunzip2 > curator
+curl -L "https://download.fpcomplete.com/stackage-curator-2/curator-7c719d6d48839c94a79dc2ad2ace89074e3dd997.bz2" | bunzip2 > curator
 chmod +x curator
 echo -n "curator version: "
 docker run --rm -v $(pwd)/curator:/exe $IMAGE /exe --version
 
-curl -L "https://download.fpcomplete.com/stackage-curator-2/stack-4033c93815477e5b565d9a2a61b54e04da0863ef.bz2" | bunzip2 > stack
+curl -L "https://download.fpcomplete.com/stackage-curator-2/stack-fffc0a40e2253788f6b9cb7471c03fd571d69bde.bz2" | bunzip2 > stack
 chmod +x stack
 echo -n "stack version: "
 docker run --rm -v $(pwd)/stack:/exe $IMAGE /exe --version
@@ -143,8 +143,6 @@ docker run $ARGS_UPLOAD $IMAGE /bin/bash -c "curator upload-docs --target $TARGE
 # For some reason, registering on Hackage fails with inscrutable error messages. Disabling.
 # docker run $ARGS_UPLOAD $IMAGE /bin/bash -c "exec curator hackage-distro --target $TARGET"
 
-docker run $ARGS_UPLOAD $IMAGE curator legacy-bulk --stackage-snapshots /dot-stackage/curator/stackage-snapshots/ --lts-haskell /dot-stackage/curator/lts-haskell/ --stackage-nightly /dot-stackage/curator/stackage-nightly/
-
 # Build and push docker image fpco/stack-build & fpco/stack-build-small for current release
 
 if [ $SHORTNAME = "lts" ]
@@ -153,22 +151,6 @@ then
     $ROOT/dockerfiles/build.sh --push $TARGET
     $ROOT/dockerfiles/build.sh --push --small $TARGET
 fi
-
-(
-if [ $SHORTNAME = "lts" ]
-then
-    cd $DOT_STACKAGE_DIR/curator/lts-haskell
-else
-    cd $DOT_STACKAGE_DIR/curator/stackage-nightly
-fi
-
-git add *.yaml
-git diff-index --quiet HEAD && echo No changes && exit 0
-git config user.name "Stackage build server"
-git config user.email "michael@snoyman.com"
-git commit -a -m "More conversions $(date)"
-GIT_SSH_COMMAND="ssh -i $SSH_DIR/id_rsa" git push origin master
-)
 
 echo -n "Completed at "
 date
