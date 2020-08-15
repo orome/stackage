@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
--- stack --resolver lts-14 script
+-- stack --resolver nightly script
 
 -- Utility to remove old libs installed under .stack-work/ to save diskspace
 
@@ -10,6 +10,10 @@ import Data.List
 import System.Directory
 import System.FilePath
 import Text.Regex.TDFA
+
+-- keep 2 latest builds
+keepBuilds :: Int
+keepBuilds = 2
 
 main = do
   files <- sort <$> listDirectory "."
@@ -28,7 +32,7 @@ main = do
 
     extractNameInternal :: String -> String
     extractNameInternal p =
-      let (name,match,internal) = p =~ "-[0-9.]+-[0-9A-Za-z]{20,22}" :: (String, String, String)
+      let (name,match,internal) = p =~ "-[0-9.]+-[0-9A-Za-z]{19,22}" :: (String, String, String)
       in if null match || null name then error $ p ++ " not in correct name-version-hash format"
          else name ++ internal
 
@@ -42,8 +46,7 @@ main = do
     removeDashSegment = dropWhileEnd (/= '-')
 
     removeOlder remover files = do
-      -- keep 2 latest builds
-      oldfiles <- drop 2 . reverse <$> sortByAge files
+      oldfiles <- drop keepBuilds . reverse <$> sortByAge files
       mapM_ remover oldfiles
 
     sortByAge files = do
