@@ -1,6 +1,6 @@
 ghc-major-version: "8.10"
 # new curator is supposed to use exact GHC version
-ghc-version: "8.10.1"
+ghc-version: "8.10.2"
 
 # This affects which version of the Cabal file format we allow. We
 # should ensure that this is always no greater than the version
@@ -4940,9 +4940,15 @@ packages:
 
       # https://github.com/commercialhaskell/stackage/issues/5597
       - optparse-applicative < 0.16
+      - optparse-generic < 1.4.3
+      - turtle < 1.5.21
 
       # https://github.com/commercialhaskell/stackage/issues/5598
       - base64-bytestring < 1.2
+
+      # https://github.com/commercialhaskell/stackage/issues/5601
+      - hslua < 1.2
+      - hslua-module-text < 0.3
 
 # end of packages
 
@@ -5603,6 +5609,7 @@ expected-test-failures:
     - crypto-pubkey # https://github.com/vincenthz/hs-crypto-pubkey/issues/23
     - doctest-discover # 0.1.0.9 https://github.com/karun012/doctest-discover/issues/22
     - doctest
+    - morpheus-graphql-client # https://github.com/commercialhaskell/stackage/issues/5602
 
     # Assertion failures, these can be real bugs or just limitations
     # in the test cases.
